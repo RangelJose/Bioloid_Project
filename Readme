@@ -1,0 +1,4 @@
+This Repository contains the Forward Kinematics, Forward Differential
+Kinematics, and the Herarchical Inverse Kinematics for the Bioloid robot
+with 24 Degrees of freedom and four end-effectors with a Virtual model in
+Matlab
