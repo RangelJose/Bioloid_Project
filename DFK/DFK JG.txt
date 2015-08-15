@@ -1,0 +1,51 @@
+function  out = Bioloid_Jg_SV (q)
+%% Geometric Jacobian matrix
+% Inputs:
+%    q = Robot configuration, i.e. each element of q is a joint position
+% Outputs:
+%    Jg = Geometric Jacobian matrix
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+global srcLoaded Bioloidmodel
+if isempty(Bioloidmodel)
+    if isempty(srcLoaded)
+        addpath(genpath('src'));
+        display('--> Folder src and subfolders added to the path')
+        srcLoaded = true;
+    end
+    Bioloid_Model();
+    display('-->Bioloid model loaded')
+end
+T=body_LF_Transform (Bioloidmodel.NB, Bioloidmodel.LFinPF, Bioloidmodel.axes, q, Bioloidmodel.parent);
+T_ee{1} = T{9}*Bioloidmodel.EEinLF{1}; %End-effector Right Arm
+T_ee{2} = T{12}*Bioloidmodel.EEinLF{2}; %End-effector Left Arm
+T_ee{3} = T{18}*Bioloidmodel.EEinLF{3}; %End-effector Right Leg
+T_ee{4} = T{24}*Bioloidmodel.EEinLF{4}; %End-effector Left Leg
+O_n{1}=T_ee{1}(1:3,4);
+O_n{2}=T_ee{2}(1:3,4);
+O_n{3}=T_ee{3}(1:3,4);
+O_n{4}=T_ee{4}(1:3,4);
+EtaR=Eta_Row(Bioloidmodel.NB,Bioloidmodel.axes,q,Bioloidmodel.parent);
+Jw=Jw_Joint(Bioloidmodel.NB,Bioloidmodel.axes,EtaR);
+O=O_Joint(Bioloidmodel.NB,T);
+Jg{1}=Jg_EE(Bioloidmodel.NB,O_n{1},O,EtaR,Jw,9,Bioloidmodel.parent);
+Jg{2}=Jg_EE(Bioloidmodel.NB,O_n{2},O,EtaR,Jw,12,Bioloidmodel.parent);
+Jg{3}=Jg_EE(Bioloidmodel.NB,O_n{3},O,EtaR,Jw,18,Bioloidmodel.parent);
+Jg{4}=Jg_EE(Bioloidmodel.NB,O_n{4},O,EtaR,Jw,24,Bioloidmodel.parent);
+Js=Jg{1}(1:3,1:24)
+Euler_RH=EulerXYZ(T_ee{1}(1:3,1:3));
+Euler_LH=EulerXYZ(T_ee{2}(1:3,1:3));
+Euler_RF=EulerXYZ(T_ee{3}(1:3,1:3));
+Euler_LF=EulerXYZ(T_ee{4}(1:3,1:3));
+
+Pose_RH=[T_ee{1}(1:3,4);Euler_RH.'];
+Pose_LH=[T_ee{2}(1:3,4);Euler_LH.'];
+Pose_RF=[T_ee{3}(1:3,4);Euler_RF.'];
+Pose_LF=[T_ee{4}(1:3,4);Euler_LF.'];
+
+%Jg=zeros(6,100)
+%% Outputs
+out = [Jg{1}(:,1);Jg{1}(:,2);Jg{1}(:,3);Jg{1}(:,4);Jg{1}(:,5);Jg{1}(:,6);Jg{1}(:,7);Jg{1}(:,8);Jg{1}(:,9);Jg{1}(:,10);Jg{1}(:,11);Jg{1}(:,12);Jg{1}(:,13);Jg{1}(:,14);Jg{1}(:,15);Jg{1}(:,16);Jg{1}(:,17);Jg{1}(:,18);Jg{1}(:,19);Jg{1}(:,20);Jg{1}(:,21);Jg{1}(:,22);Jg{1}(:,23);Jg{1}(:,24);Pose_RH;
+       Jg{2}(:,1);Jg{2}(:,2);Jg{2}(:,3);Jg{2}(:,4);Jg{2}(:,5);Jg{2}(:,6);Jg{2}(:,7);Jg{2}(:,8);Jg{2}(:,9);Jg{2}(:,10);Jg{2}(:,11);Jg{2}(:,12);Jg{2}(:,13);Jg{2}(:,14);Jg{2}(:,15);Jg{2}(:,16);Jg{2}(:,17);Jg{2}(:,18);Jg{2}(:,19);Jg{2}(:,20);Jg{2}(:,21);Jg{2}(:,22);Jg{2}(:,23);Jg{2}(:,24);Pose_LH;
+       Jg{3}(:,1);Jg{3}(:,2);Jg{3}(:,3);Jg{3}(:,4);Jg{3}(:,5);Jg{3}(:,6);Jg{3}(:,7);Jg{3}(:,8);Jg{3}(:,9);Jg{3}(:,10);Jg{3}(:,11);Jg{3}(:,12);Jg{3}(:,13);Jg{3}(:,14);Jg{3}(:,15);Jg{3}(:,16);Jg{3}(:,17);Jg{3}(:,18);Jg{3}(:,19);Jg{3}(:,20);Jg{3}(:,21);Jg{3}(:,22);Jg{3}(:,23);Jg{3}(:,24);Pose_RF;
+       Jg{4}(:,1);Jg{4}(:,2);Jg{4}(:,3);Jg{4}(:,4);Jg{4}(:,5);Jg{4}(:,6);Jg{4}(:,7);Jg{4}(:,8);Jg{4}(:,9);Jg{4}(:,10);Jg{4}(:,11);Jg{4}(:,12);Jg{4}(:,13);Jg{4}(:,14);Jg{4}(:,15);Jg{4}(:,16);Jg{4}(:,17);Jg{4}(:,18);Jg{4}(:,19);Jg{4}(:,20);Jg{4}(:,21);Jg{4}(:,22);Jg{4}(:,23);Jg{4}(:,24);Pose_LF];
+end
